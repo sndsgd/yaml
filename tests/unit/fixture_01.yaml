@@ -1,0 +1,46 @@
+---
+# the yaml to parse
+seconds: !seconds 1 day
+char_01: !char 123
+char_02: !char
+  length: 4
+  default: abcd
+
+email: !varchar
+shorter_email: !varchar 200
+shortest_email: !varchar
+  length: 50
+  default: asd@asd.com
+
+created_on: !unix_timestamp
+
+---
+# the expected parsed result
+seconds: 86400
+char_01:
+  type: string
+  length: "123"
+  isFixed: true
+char_02:
+  type: string
+  length: "4"
+  isFixed: true
+  default: abcd
+email:
+  type: string
+  length: "255"
+  isFixed: false
+shorter_email:
+  type: string
+  length: "200"
+  isFixed: false
+shortest_email:
+  type: string
+  length: "50"
+  isFixed: false
+  default: asd@asd.com
+created_on:
+  type: integer
+  min: "0"
+  max: "4294967295"
+  comment: unix timestamp

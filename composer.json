@@ -1,0 +1,18 @@
+{
+    "name": "sndsgd/yaml",
+    "require": {
+        "php": ">=7.1",
+        "ext-yaml": "*",
+        "sndsgd/util": ">=2.1.0",
+        "sndsgd/fs": "^0.4.5"
+    },
+    "require-dev": {
+        "mikey179/vfsStream": "~1.6.3",
+        "phpunit/phpunit": "~7"
+    },
+    "autoload": {
+        "psr-4": {
+            "sndsgd\\yaml\\": "src/"
+        }
+    }
+}
