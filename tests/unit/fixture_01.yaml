@@ -1,18 +1,18 @@
 ---
 # the yaml to parse
 seconds: !seconds 1 day
-char_01: !char 123
-char_02: !char
+char_01: !type/char 123
+char_02: !type/char
   length: 4
   default: abcd
 
-email: !varchar
-shorter_email: !varchar 200
-shortest_email: !varchar
+email: !type/varchar
+shorter_email: !type/varchar 200
+shortest_email: !type/varchar
   length: 50
   default: asd@asd.com
 
-created_on: !unix_timestamp
+created_on: !type/unix_timestamp
 
 ---
 # the expected parsed result
@@ -43,4 +43,3 @@ created_on:
   type: integer
   min: "0"
   max: "4294967295"
-  comment: unix timestamp

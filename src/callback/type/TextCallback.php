@@ -1,11 +1,11 @@
 <?php
 
-namespace sndsgd\yaml\callback;
+namespace sndsgd\yaml\callback\type;
 
 /**
  * A callback that creates an integer object that contains a `type`, `min`, and `max`
  */
-class TextCallback extends \sndsgd\yaml\callback\CallbackAbstract
+class TextCallback implements \sndsgd\yaml\callback\CallbackInterface
 {
     /**
      * The lengths for various types of text columns
@@ -13,10 +13,10 @@ class TextCallback extends \sndsgd\yaml\callback\CallbackAbstract
      * @var array<string,string>
      */
     const LENGTHS = [
-        "!tinytext" => "255",
-        "!text" => "65535",
-        "!mediumtext" => "16777215",
-        "!longtext" => "4294967295",
+        "!type/tinytext" => "255",
+        "!type/text" => "65535",
+        "!type/mediumtext" => "16777215",
+        "!type/longtext" => "4294967295",
     ];
 
     /**
@@ -37,20 +37,21 @@ class TextCallback extends \sndsgd\yaml\callback\CallbackAbstract
         \sndsgd\yaml\ParserContext $context
     )
     {
-        if (is_array($this->value)) {
-            static::ensureKeysAreNotSet($this->value, $this->tag, "type", "length");
-            $value = $this->value;
-        } elseif (is_string($this->value) && trim($this->value) === "") {
+        \sndsgd\yaml\CallbackHelper::verifyTag($tag, $this->getTags());
+
+        if (is_array($value)) {
+            \sndsgd\yaml\CallbackHelper::ensureKeysAreNotSet($value, $tag, "type", "length");
+        } elseif (is_string($value) && trim($value) === "") {
             $value = [];
         } else {
             throw new \sndsgd\yaml\ParserException(
-                "failed to convert '$this->tag' to a string object; expecting the ".
+                "failed to convert '$tag' to a string object; expecting the ".
                 "tag without any content, or with an object of values to merge"
             );
         }
 
         return array_merge(
-            ["type" => "string", "length" => self::LENGTHS[$this->tag]],
+            ["type" => "string", "length" => self::LENGTHS[$tag]],
             $value
         );
     }

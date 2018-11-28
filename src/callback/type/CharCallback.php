@@ -1,8 +1,8 @@
 <?php
 
-namespace sndsgd\yaml\callback;
+namespace sndsgd\yaml\callback\type;
 
-class CharCallback extends CallbackAbstract
+class CharCallback implements \sndsgd\yaml\callback\CallbackInterface
 {
     /**
      * A map of tags and whether the associated string object will have a fixed length
@@ -10,8 +10,8 @@ class CharCallback extends CallbackAbstract
      * @var array<string,bool>
      */
     const TAGS = [
-        '!varchar' => false,
-        '!char' => true,
+        "!type/varchar" => false,
+        "!type/char" => true,
     ];
 
     /**
@@ -32,6 +32,8 @@ class CharCallback extends CallbackAbstract
         \sndsgd\yaml\ParserContext $context
     )
     {
+        \sndsgd\yaml\CallbackHelper::verifyTag($tag, $this->getTags());
+
         if (is_int($value)) {
             $length = strval($value);
             $value = [];
@@ -42,7 +44,7 @@ class CharCallback extends CallbackAbstract
             $length = $value ?: "255";
             $value = [];
         } elseif (is_array($value)) {
-            static::ensureKeysAreNotSet($value, $tag, "type");
+            \sndsgd\yaml\CallbackHelper::ensureKeysAreNotSet($value, $tag, "type");
             $value = $value;
             $length = $value["length"] ?? "255";
             if (is_scalar($length)) {

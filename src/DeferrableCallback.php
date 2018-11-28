@@ -1,10 +1,9 @@
 <?php
 
-namespace sndsgd\yaml\callback;
+namespace sndsgd\yaml;
 
 /**
- * A class that is used to store a callback for deferred execution. This can be helpful
- * when parsing multi document yaml files.
+ * A object that is used to store a callback for deferred execution
  */
 class DeferrableCallback
 {
@@ -13,7 +12,12 @@ class DeferrableCallback
     protected $value;
     protected $flags;
 
-    public function __construct(string $tag, $value, int $flags)
+    public function __construct(
+        callback\CallbackInterface $callback,
+        string $tag,
+        $value,
+        int $flags
+    )
     {
         $this->callback = $callback;
         $this->tag = $tag;

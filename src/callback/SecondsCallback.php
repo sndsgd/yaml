@@ -2,6 +2,8 @@
 
 namespace sndsgd\yaml\callback;
 
+use \sndsgd\yaml\ParserException;
+
 /**
  * Convert a human readable time into the equivalent number of seconds
  *
@@ -9,8 +11,11 @@ namespace sndsgd\yaml\callback;
  *   !seconds 1 hour == 3600
  *   !seconds 1 day == 86400
  */
-class SecondsCallback extends CallbackAbstract
+class SecondsCallback implements CallbackInterface
 {
+    private const ERR_MSG = "failed to convert %s to seconds; " .
+        "expecting a human readable amount of time as a string";
+
     /**
      * @inheritDoc
      */
@@ -29,19 +34,20 @@ class SecondsCallback extends CallbackAbstract
         \sndsgd\yaml\ParserContext $context
     )
     {
-        if (!is_string($value) || empty($value)) {
-            throw new \sndsgd\yaml\ParserException(
-                "failed to convert '$this->tag' to seconds; expecting the ".
-                "tag followed by a human readable amount of time"
-            );
+        \sndsgd\yaml\CallbackHelper::verifyTag($tag, $this->getTags());
+
+        if (!is_string($value)) {
+            throw new ParserException(sprintf(self::ERR_MSG, "a non string value"));
+        }
+
+        if (empty($value)) {
+            throw new ParserException(sprintf(self::ERR_MSG, "an empty value"));
         }
 
         $now = time();
         $then = strtotime("+".$value, $now);
         if ($then === false) {
-            throw new \sndsgd\yaml\ParserException(
-                "failed to convert '$this->value' to seconds"
-            );
+            throw new ParserException(sprintf(self::ERR_MSG, "'$value'"));
         }
 
         return $then - $now;

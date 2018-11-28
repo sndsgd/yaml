@@ -69,6 +69,11 @@ class Parser
             foreach ($callback->getTags() as $tag) {
                 $this->parseCallbacks[$tag] = [$this, "executeTagCallback"];
                 $this->parseCallbackInstances[$tag] = $callback;
+
+                # allow deferring any callback
+                $tag = "$tag/defer";
+                $this->parseCallbacks[$tag] = [$this, "executeTagCallback"];
+                $this->parseCallbackInstances[$tag] = $callback;
             }
         }
     }
@@ -120,8 +125,7 @@ class Parser
         # verify the max number of documents is not exceeded
         if ($maxDocuments > 0 && $documentCount > $maxDocuments) {
             throw new \Exception(
-                "$documentCount documents encountered; ".
-                "expecting no more than $maxDocuments"
+                "$documentCount documents encountered; expecting no more than $maxDocuments"
             );
         }
 
@@ -157,24 +161,21 @@ class Parser
      */
     public function executeTagCallback($value, string $tag, int $flags)
     {
+        $isDeferable = false;
         if (\sndsgd\Str::endsWith($tag, "/defer")) {
             $isDeferable = true;
-            $tag = substr($tag, 0, -6);
-        } else {
-            $isDeferable = false;
+            $tag = \sndsgd\Str::before($tag, "/defer", true);
         }
 
-        $callback = $this->parseCallbackInstances[$tag] ?? "";
-        if (empty($callback)) {
-            if (empty($value)) {
-                return $tag;
-            }
-
-            throw new ParserException("unknown callback '$tag'");
+        # if the callback isn't registered, we'll only try to execute it
+        # if there is no value
+        $callback = $this->parseCallbackInstances[$tag] ?? null;
+        if (!$callback) {
+            return $tag;
         }
 
         if ($isDeferable) {
-            return new \sndsgd\yaml\callback\DeferrableCallback($callback, $tag, $value, $flags);
+            return new \sndsgd\yaml\DeferrableCallback($callback, $tag, $value, $flags);
         }
 
         return $callback->execute($tag, $value, $flags, $this->context);

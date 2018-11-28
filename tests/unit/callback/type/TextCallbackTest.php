@@ -1,6 +1,6 @@
 <?php
 
-namespace sndsgd\yaml\callback;
+namespace sndsgd\yaml\callback\type;
 
 class TextCallbackTest extends \PHPUnit\Framework\TestCase
 {
@@ -9,7 +9,8 @@ class TextCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidTagException()
     {
-        $callback = new TextCallback("", "!invalid");
+        $callback = new TextCallback();
+        $callback->execute("!type/invalid", "", 0, new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -21,8 +22,8 @@ class TextCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidValueException($value)
     {
-        $callback = new TextCallback($value, "!text");
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $callback = new TextCallback();
+        $callback->execute("!type/text", $value, 0, new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -46,8 +47,8 @@ class TextCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidKey($value)
     {
-        $callback = new TextCallback($value, "!text");
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $callback = new TextCallback();
+        $callback->execute("!type/text", $value, 0, new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -68,8 +69,11 @@ class TextCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute(string $tag, $value, array $expect)
     {
-        $callback = new TextCallback($value, $tag);
-        $this->assertSame($expect, $callback->execute(new \sndsgd\yaml\ParserContext()));
+        $callback = new TextCallback();
+        $this->assertSame(
+            $expect,
+            $callback->execute($tag, $value, 0, new \sndsgd\yaml\ParserContext())
+        );
     }
 
     /**
@@ -81,32 +85,32 @@ class TextCallbackTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                "!tinytext",
+                "!type/tinytext",
                 "",
                 ["type" => "string", "length" => "255"]
             ],
             [
-                "!text",
+                "!type/text",
                 "",
                 ["type" => "string", "length" => "65535"]
             ],
             [
-                "!mediumtext",
+                "!type/mediumtext",
                 "",
                 ["type" => "string", "length" => "16777215"]
             ],
             [
-                "!longtext",
+                "!type/longtext",
                 "",
                 ["type" => "string", "length" => "4294967295"]
             ],
             [
-                "!tinytext",
+                "!type/tinytext",
                 ["isNullable" => true],
                 ["type" => "string", "length" => "255", "isNullable" => true],
             ],
             [
-                "!mediumtext",
+                "!type/mediumtext",
                 ["isNullable" => true],
                 ["type" => "string", "length" => "16777215", "isNullable" => true],
             ],

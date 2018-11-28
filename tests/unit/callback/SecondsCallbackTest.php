@@ -4,15 +4,23 @@ namespace sndsgd\yaml\callback;
 
 class SecondsCallbackTest extends \PHPUnit\Framework\TestCase
 {
+    private $callback;
+    private $context;
+
+    public function setup()
+    {
+        $this->callback = new SecondsCallback();
+        $this->context = new \sndsgd\yaml\ParserContext();
+    }
+
     /**
-     * @expectedException \sndsgd\yaml\ParserException
-     * @expectedExceptionMessage expecting the tag followed by a human readable amount of time
      * @dataProvider provideExecuteBadValue
+     * @expectedException \sndsgd\yaml\ParserException
+     * @expectedExceptionMessage failed to convert
      */
     public function testExecuteBadValue($value)
     {
-        $callback = new SecondsCallback($value, "!seconds");
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $this->callback->execute("!seconds", $value, 0, $this->context);
     }
 
     /**
@@ -36,8 +44,7 @@ class SecondsCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteConvertFailure()
     {
-        $callback = new SecondsCallback("blegh", "!seconds");
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $this->callback->execute("!seconds", "blegh", 0, $this->context);
     }
 
     /**
@@ -45,8 +52,10 @@ class SecondsCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute($value, int $expect)
     {
-        $callback = new SecondsCallback($value, "!seconds");
-        $this->assertSame($expect, $callback->execute(new \sndsgd\yaml\ParserContext()));
+        $this->assertSame(
+            $expect,
+            $this->callback->execute("!seconds", $value, 0, $this->context)
+        );
     }
 
     /**

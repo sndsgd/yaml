@@ -1,0 +1,20 @@
+---
+# the yaml to parse
+small_int_value: !type/uint32
+  rules:
+  - !rule/required
+    error_message: this is a required field
+  - !rule/min 42
+
+---
+# the expected parsed result
+small_int_value:
+  type: integer
+  min: "0"
+  max: "4294967295"
+  rules:
+  - rule: sndsgd\rule\RequiredRule
+    error_message: this is a required field
+  - rule: sndsgd\rule\MinRule
+    min: "42"
+

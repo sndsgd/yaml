@@ -1,6 +1,6 @@
 <?php
 
-namespace sndsgd\yaml\callback;
+namespace sndsgd\yaml\callback\type;
 
 class IntegerCallbackTest extends \PHPUnit\Framework\TestCase
 {
@@ -9,7 +9,8 @@ class IntegerCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidTagException()
     {
-        $callback = new IntegerCallback("", "!invalid");
+        $callback = new IntegerCallback();
+        $callback->execute('!invalid_tag', '', 0, new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -21,8 +22,8 @@ class IntegerCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidValueException($value)
     {
-        $callback = new IntegerCallback($value, "!uint32");
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $callback = new IntegerCallback();
+        $callback->execute("!type/uint32", $value, 0,  new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -46,8 +47,8 @@ class IntegerCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidKey($value)
     {
-        $callback = new IntegerCallback($value, "!uint64");
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $callback = new IntegerCallback();
+        $callback->execute("!type/uint64", $value, 0, new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -69,8 +70,8 @@ class IntegerCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute(string $tag, $value, array $expect)
     {
-        $callback = new IntegerCallback($value, $tag);
-        $this->assertSame($expect, $callback->execute(new \sndsgd\yaml\ParserContext()));
+        $callback = new IntegerCallback();
+        $this->assertSame($expect, $callback->execute($tag, $value, 0, new \sndsgd\yaml\ParserContext()));
     }
 
     /**
@@ -82,47 +83,47 @@ class IntegerCallbackTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                "!uint8",
+                "!type/uint8",
                 "",
                 ["type" => "integer", "min" => "0", "max" => "255"],
             ],
             [
-                "!int8",
+                "!type/int8",
                 "",
                 ["type" => "integer", "min" => "-128", "max" => "127"],
             ],
             [
-                "!uint16",
+                "!type/uint16",
                 "",
                 ["type" => "integer", "min" => "0", "max" => "65535"],
             ],
             [
-                "!int16",
+                "!type/int16",
                 "",
                 ["type" => "integer", "min" => "32768", "max" => "32767"],
             ],
             [
-                "!uint32",
+                "!type/uint32",
                 "",
                 ["type" => "integer", "min" => "0", "max" => "4294967295"],
             ],
             [
-                "!int32",
+                "!type/int32",
                 "",
                 ["type" => "integer", "min" => "-2147483648", "max" => "2147483647"],
             ],
             [
-                "!uint64",
+                "!type/uint64",
                 "",
                 ["type" => "integer", "min" => "0", "max" => "18446744073709551615"],
             ],
             [
-                "!int64",
+                "!type/int64",
                 "",
                 ["type" => "integer", "min" => "-9223372036854775808", "max" => "9223372036854775807"],
             ],
             [
-                "!uint32",
+                "!type/uint32",
                 ["isNullable" => true],
                 [
                     "type" => "integer",
@@ -132,7 +133,7 @@ class IntegerCallbackTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                "!uint64",
+                "!type/uint64",
                 ["isNullable" => true, "whatever" => 1234],
                 [
                     "type" => "integer",

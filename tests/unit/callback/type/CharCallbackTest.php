@@ -1,17 +1,9 @@
 <?php
 
-namespace sndsgd\yaml\callback;
+namespace sndsgd\yaml\callback\type;
 
 class CharCallbackTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \UnexpectedValueException
-     */
-    public function testExecuteInvalidTagException()
-    {
-        $callback = new CharCallback("", "!not_valid");
-    }
-
     /**
      * @expectedException \sndsgd\yaml\ParserException
      * @expectedExceptionMessage expecting the tag without any content
@@ -21,8 +13,8 @@ class CharCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidValueException($value)
     {
-        $callback = new CharCallback($value, "!char");
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $callback = new CharCallback();
+        $callback->execute("!type/char", $value, 0, new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -46,8 +38,8 @@ class CharCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteInvalidKey(array $value, string $tag)
     {
-        $callback = new CharCallback($value, $tag);
-        $callback->execute(new \sndsgd\yaml\ParserContext());
+        $callback = new CharCallback();
+        $callback->execute($tag, $value, 0, new \sndsgd\yaml\ParserContext());
     }
 
     /**
@@ -58,8 +50,8 @@ class CharCallbackTest extends \PHPUnit\Framework\TestCase
     public function provideExecuteInvalidKey(): array
     {
         return [
-            [["type" => "abc"], "!char"],
-            [["type" => "def"], "!varchar"],
+            [["type" => "abc"], "!type/char"],
+            [["type" => "def"], "!type/varchar"],
         ];
     }
 
@@ -68,8 +60,8 @@ class CharCallbackTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute(string $tag, $value, array $expect)
     {
-        $callback = new CharCallback($value, $tag);
-        $this->assertSame($expect, $callback->execute(new \sndsgd\yaml\ParserContext()));
+        $callback = new CharCallback();
+        $this->assertSame($expect, $callback->execute($tag, $value, 0, new \sndsgd\yaml\ParserContext()));
     }
 
     /**
@@ -81,37 +73,37 @@ class CharCallbackTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                "!char",
+                "!type/char",
                 "",
                 ["type" => "string", "length" => "255", "isFixed" => true],
             ],
             [
-                "!varchar",
+                "!type/varchar",
                 "",
                 ["type" => "string", "length" => "255", "isFixed" => false],
             ],
             [
-                "!char",
+                "!type/char",
                 100,
                 ["type" => "string", "length" => "100", "isFixed" => true],
             ],
             [
-                "!char",
+                "!type/char",
                 "100",
                 ["type" => "string", "length" => "100", "isFixed" => true],
             ],
             [
-                "!varchar",
+                "!type/varchar",
                 101,
                 ["type" => "string", "length" => "101", "isFixed" => false],
             ],
             [
-                "!char",
+                "!type/char",
                 ["length" => 42],
                 ["type" => "string", "length" => "42", "isFixed" => true],
             ],
             [
-                "!char",
+                "!type/char",
                 ["length" => 123, "isNullable" => true],
                 ["type" => "string", "length" => "123", "isFixed" => true, "isNullable" => true],
             ],
