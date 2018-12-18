@@ -1,5 +1,15 @@
 {
     "name": "sndsgd/yaml",
+    "description": "YAML parsing enhancements for PHP",
+    "type": "library",
+    "homepage": "https://github.com/sndsgd/yaml",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Russell B",
+            "homepage": "http://snds.gd/"
+        }
+    ],
     "require": {
         "php": ">=7.1",
         "ext-yaml": "*",
