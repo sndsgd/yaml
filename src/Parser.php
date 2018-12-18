@@ -18,13 +18,6 @@ class Parser
     const TAG_REGEX = "/^![a-zA-Z0-9_]+$/";
 
     /**
-     * A regex used to match the line and column information in error messages
-     *
-     * @var string
-     */
-    const ERROR_REGEX = "/\\(line (\d+), column (\d+)\\)/";
-
-    /**
      * The context to use when executing YAML callbacks
      *
      * @var ParserContext
@@ -99,17 +92,15 @@ class Parser
      * @param int $prependedLines The number of lines prepended to the contents
      * @return mixed
      */
-    public function parse(string $yaml, int $maxDocuments = 1, int $prependedLines = 0)
+    public function parse(
+        string $yaml,
+        int $maxDocuments = 1,
+        ParserFiles $parserFiles = null
+    )
     {
         if ($maxDocuments < 0) {
             throw new \UnexpectedValueException(
                 "'maxDocuments' must be greater than or equal to 0"
-            );
-        }
-
-        if ($prependedLines < 0) {
-            throw new \UnexpectedValueException(
-                "'prependedLines' must be greater than or equal to 0"
             );
         }
 
@@ -141,13 +132,24 @@ class Parser
      */
     public function parseFile(string $path, int $maxDocuments = 1)
     {
-        $file = \sndsgd\Fs::file($path);
-        $yaml = $file->read();
-        if ($yaml === false) {
-            throw new \Exception("failed to parse YAML file; ".$file->getError());
+        return $this->parseFiles([$path], $maxDocuments);
+    }
+
+    /**
+     * Parse mutliple files merged together as one document, and handle updating
+     * errors messages accordingly
+     *
+     * @param string ...$paths The paths to the files to merge and parse
+     * @return mixed
+     */
+    public function parseFiles(array $paths, int $maxDocuments = 1)
+    {
+        $parserFiles = new ParserFiles();
+        foreach ($paths as $path) {
+            $parserFiles->addFile($path);
         }
 
-        return $this->parse($yaml, $maxDocuments);
+        return $this->parse($parserFiles->getContents(), $maxDocuments, $parserFiles);
     }
 
     /**
@@ -198,7 +200,7 @@ class Parser
         string $file,
         int $line,
         array $definedVariables
-    )
+    ): void
     {
         # strip the function name from the beginning of the error message
         $search = "yaml_parse(): ";
@@ -207,18 +209,9 @@ class Parser
             $message = substr($message, strlen($search));
         }
 
-        # attempt to update the lines in the error message to reflect
-        # the number of lines that were prepended
-        $prependedLines = $definedVariables["prependedLines"] ?? 0;
-        if (
-            $prependedLines > 0 &&
-            preg_match_all(self::ERROR_REGEX, $message, $matches, PREG_SET_ORDER)
-        ) {
-            foreach ($matches as list($search, $line, $column)) {
-                $line -= $prependedLines;
-                $replace = "(line $line, column $column)";
-                $message = str_replace($search, $replace, $message);
-            }
+        $parserFiles = $definedVariables["parserFiles"];
+        if ($parserFiles instanceof ParserFiles) {
+            $message = $parserFiles->getErrorMessage($message);
         }
 
         throw new ParserException($message);
