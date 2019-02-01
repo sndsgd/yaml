@@ -139,7 +139,7 @@ class Parser
      * Parse mutliple files merged together as one document, and handle updating
      * errors messages accordingly
      *
-     * @param string ...$paths The paths to the files to merge and parse
+     * @param array<string> $paths The paths to the files to merge and parse
      * @return mixed
      */
     public function parseFiles(array $paths, int $maxDocuments = 1)

@@ -84,11 +84,15 @@ json: &json application/json; charset=utf-8
 
 _example-03.yaml_
 ```yaml
-url: https://example.com/
+url: /register
 method: POST
 headers:
   content-type: *json
 body:
-  foo: bar
+  email: foo@example.com
 ```
 
+```php
+$data = $parser->parseFiles(["example-02.yaml", "example-03.yaml"]);
+echo json_encode($data, sndsgd\JSON::HUMAN) . PHP_EOL;
+```
