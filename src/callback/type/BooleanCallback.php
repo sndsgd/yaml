@@ -4,14 +4,15 @@ namespace sndsgd\yaml\callback\type;
 
 class BooleanCallback implements \sndsgd\yaml\callback\CallbackInterface
 {
-    const DEFAULTS = ["type" => "boolean"];
+    private const TAG = "!type/boolean";
+    private const DEFAULTS = ["type" => "boolean"];
 
     /**
      * @inheritDoc
      */
     public function getTags(): array
     {
-        return ["!type/boolean"];
+        return [self::TAG];
     }
 
     /**

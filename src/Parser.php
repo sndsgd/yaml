@@ -144,11 +144,7 @@ class Parser
      */
     public function parseFiles(array $paths, int $maxDocuments = 1)
     {
-        $parserFiles = new ParserFiles();
-        foreach ($paths as $path) {
-            $parserFiles->addFile($path);
-        }
-
+        $parserFiles = new ParserFiles(... $paths);
         return $this->parse($parserFiles->getContents(), $maxDocuments, $parserFiles);
     }
 

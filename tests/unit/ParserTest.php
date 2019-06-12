@@ -6,15 +6,13 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 {
     use \phpmock\phpunit\PHPMock;
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage the YAML extension must be installed
-     */
     public function testConstructorExtensionNotLoadedException()
     {
         $extensionLoadedMock = $this->getFunctionMock(__NAMESPACE__, "extension_loaded");
         $extensionLoadedMock->expects($this->any())->willReturn(false);
 
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("the YAML extension must be installed");
         new Parser();
     }
 
@@ -25,41 +23,23 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($p1 !== $p2);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
     public function testParseMaxDocumentsException()
     {
-        $parser = new Parser();
-        $parser->parse("", -1);
+        $this->expectException(\UnexpectedValueException::class);
+        (new Parser())->parse("", -1);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
-    public function testParsePrependedLinesException()
-    {
-        $parser = new Parser();
-        $parser->parse("", 0, -1);
-    }
-
-    /**
-     * @expectedException \Exception
-     */
     public function testParseMaxDocumentsExceededException()
     {
-        $parser = new Parser();
-        $parser->parse("---\na:1\n---\nb:1", 1);
+        $this->expectException(\Exception::class);
+        (new Parser())->parse("---\na:1\n---\nb:1", 1);
     }
 
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage failed to parse YAML file; failed to read file
-     */
     public function testParseFileReadException()
     {
-        $parser = new Parser();
-        $parser->parseFile(__DIR__);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("failed to parse YAML file; failed to read file");
+        (new Parser())->parseFile(__DIR__);
     }
 
     /**
@@ -98,36 +78,11 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException sndsgd\yaml\ParserException
-     */
-    public function provideExecuteTagCallbackException()
-    {
-        $parser = new Parser();
-        $parser->executeTagCallback("not empty", "!anything");
-    }
-
-    /**
-     * @expectedException \sndsgd\yaml\ParserException
-     * @expectedExceptionMessage did not find expected node content (line 2, column 1)
-     */
-    public function testHandlerParseErrorWithPrependedLines()
-    {
-        $one = "---\none: 1\ntwo: 2\n";
-        $two = "three: 3\nbad: {\n";
-
-        $parser = new Parser();
-        $parser->parse($one . $two, 1, 4);
-    }
-
-    /**
-     * @expectedException sndsgd\yaml\ParserException
-     * @expectedExceptionMessage parsing error encountered during parsing
-     */
     public function testHandleYamlParseError()
     {
-        $parser = new Parser();
-        $parser->parse("key: {\n");
+        $this->expectException(\sndsgd\yaml\ParserException::class);
+        $this->expectExceptionMessage("parsing error encountered during parsing");
+        (new Parser())->parse("key: {\n");
     }
 
     /**

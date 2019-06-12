@@ -10,39 +10,38 @@ class ParserFilesTest extends \PHPUnit\Framework\TestCase
     const FILE_03 = self::FIXTURE_DIR . "/parser_files_03.yaml";
     const FILE_ERROR = self::FIXTURE_DIR . "/parser_files_error.yaml";
 
-    /**
-     * @expectedException sndsgd\yaml\ParserException
-     * @expectedExceptionMessage (line 8, column 1)
-     */
+    public function testConstructorEmptyPathsException()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("at least one file path is required");
+        new ParserFiles();
+    }
+
     public function testGetErrorMessageSingle(): void
     {
+        $this->expectException(\sndsgd\yaml\ParserException::class);
+        $this->expectExceptionMessage("(line 8, column 1)");
         (new Parser())->parseFiles([self::FILE_ERROR]);
     }
 
-    /**
-     * @expectedException sndsgd\yaml\ParserException
-     * @expectedExceptionMessage parser_files_error.yaml, line 8, column 1)
-     */
     public function testGetErrorMessage02(): void
     {
+        $this->expectException(\sndsgd\yaml\ParserException::class);
+        $this->expectExceptionMessage("parser_files_error.yaml, line 8, column 1)");
         (new Parser())->parseFiles([self::FILE_ERROR, self::FILE_01]);
     }
 
-    /**
-     * @expectedException sndsgd\yaml\ParserException
-     * @expectedExceptionMessage parser_files_error.yaml, line 8, column 1)
-     */
     public function testGetErrorMessage03(): void
     {
+        $this->expectException(\sndsgd\yaml\ParserException::class);
+        $this->expectExceptionMessage("parser_files_error.yaml, line 8, column 1)");
         (new Parser())->parseFiles([self::FILE_01, self::FILE_ERROR]);
     }
 
-    /**
-     * @expectedException sndsgd\yaml\ParserException
-     * @expectedExceptionMessage parser_files_error.yaml, line 8, column 1)
-     */
     public function testGetErrorMessage04(): void
     {
+        $this->expectException(\sndsgd\yaml\ParserException::class);
+        $this->expectExceptionMessage("parser_files_error.yaml, line 8, column 1)");
         (new Parser())->parseFiles([self::FILE_01, self::FILE_02, self::FILE_ERROR]);
     }
 }

@@ -13,6 +13,7 @@ use \sndsgd\yaml\ParserException;
  */
 class SecondsCallback implements CallbackInterface
 {
+    private const TAG = "!seconds";
     private const ERR_MSG = "failed to convert %s to seconds; " .
         "expecting a human readable amount of time as a string";
 
@@ -21,7 +22,7 @@ class SecondsCallback implements CallbackInterface
      */
     public function getTags(): array
     {
-        return ['!seconds'];
+        return [self::TAG];
     }
 
     /**
@@ -45,7 +46,7 @@ class SecondsCallback implements CallbackInterface
         }
 
         $now = time();
-        $then = strtotime("+".$value, $now);
+        $then = strtotime("+" . $value, $now);
         if ($then === false) {
             throw new ParserException(sprintf(self::ERR_MSG, "'$value'"));
         }

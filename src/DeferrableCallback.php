@@ -3,7 +3,7 @@
 namespace sndsgd\yaml;
 
 /**
- * A object that is used to store a callback for deferred execution
+ * An object that is used to store a callback for deferred execution
  */
 class DeferrableCallback
 {

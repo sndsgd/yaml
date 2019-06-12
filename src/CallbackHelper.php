@@ -35,8 +35,8 @@ class CallbackHelper
 
         $noun = ($len === 1) ? "key" : "keys";
         throw new \sndsgd\yaml\ParserException(
-            "failed to process callback '$tag'; the following $noun ".
-            "would be overwritten: ".implode(", ", $tmp)
+            "failed to process callback '$tag'; the following $noun " .
+            "would be overwritten: " . implode(", ", $tmp)
         );
     }
 

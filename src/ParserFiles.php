@@ -2,6 +2,11 @@
 
 namespace sndsgd\yaml;
 
+/**
+ * A list of one or more files that can be parsed as one.
+ * Used to ensure error messages point to the original file/line as opposed
+ * to the line in the combined contents.
+ */
 class ParserFiles
 {
     /**
@@ -14,7 +19,18 @@ class ParserFiles
     private $contents = "";
     private $linesPerFile = [];
 
-    public function addFile(string $path): void
+    public function __construct(string ...$paths)
+    {
+        if (empty($paths)) {
+            throw new \LogicException("at least one file path is required");
+        }
+
+        foreach ($paths as $path) {
+            $this->addFile($path);
+        }
+    }
+
+    private function addFile(string $path): void
     {
         $file = \sndsgd\Fs::file($path);
         $yaml = $file->read();
@@ -33,12 +49,6 @@ class ParserFiles
 
     public function getContents(): string
     {
-        if (empty($this->linesPerFile)) {
-            throw new \LogicException(
-                "files must be added before contents can be retrieved"
-            );
-        }
-
         return $this->contents;
     }
 
