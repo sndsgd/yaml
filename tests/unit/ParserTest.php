@@ -88,15 +88,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideFixtures
      */
-    public function testFixtures(array $callbacks, string $path)
-    {
-        $parser = new Parser(new ParserContext(), ...$callbacks);
-        [$test, $expect] = $parser->parseFile($path, 2);
-
-        $this->assertSame($expect, $test);
-    }
-
-    public function provideFixtures(): array
+    public function testFixtures(string $path)
     {
         $callbacks = [
             new callback\SecondsCallback(),
@@ -107,9 +99,17 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             new callback\type\IntegerCallback(),
         ];
 
+        $parser = new Parser(new ParserContext(), ...$callbacks);
+        [$test, $expect] = $parser->parseFile($path, 2);
+
+        $this->assertSame($expect, $test);
+    }
+
+    public function provideFixtures(): array
+    {
         return [
-            [$callbacks, __DIR__."/fixture_01.yaml"],
-            [$callbacks, __DIR__ . "/fixtures/rules.yaml"],
+            [__DIR__ . "/fixture_01.yaml"],
+            [__DIR__ . "/fixtures/rules.yaml"],
         ];
     }
 
@@ -117,7 +117,66 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     {
         $parser = new Parser(new ParserContext(), new callback\SecondsCallback());
         $result = $parser->parse("seconds: !seconds/defer 1 minute");
-        $this->assertInstanceOf(DeferrableCallback::class, $result['seconds']);
-        $this->assertSame(60, $result['seconds']->execute(new ParserContext()));
+        $this->assertInstanceOf(DeferrableCallback::class, $result["seconds"]);
+        $this->assertSame(60, $result["seconds"]->execute(new ParserContext()));
+    }
+
+    /**
+     * @dataProvider provideParseFilesVariableFilter
+     */
+    public function testParseFilesVariableFilter(
+        array $contents,
+        bool $filterVariables,
+        array $expect
+    ): void
+    {
+        $files = [];
+        foreach ($contents as $fileContent) {
+            $file = \sndsgd\fs\Temp::createFile(uniqid());
+            $file->write($fileContent);
+            $files[] = $file->getPath();
+        }
+
+        $result = (new Parser())->parseFiles($files, 1, $filterVariables);
+        $this->assertSame($expect, $result);
+    }
+
+    public function provideParseFilesVariableFilter(): array
+    {
+        return [
+            [
+                [
+                    "---\n_: &foo this is the value",
+                    "foo: *foo",
+                ],
+                false,
+                [
+                    "_" =>  "this is the value",
+                    "foo" => "this is the value",
+                ],
+            ],
+            [
+                [
+                    "---\n_: &foo this is the value",
+                    "foo: *foo",
+                ],
+                true,
+                [
+                    "foo" => "this is the value",
+                ],
+            ],
+            [
+                [
+                    "---\n_: &foo1 foo1\n_: &foo2 foo2",
+                    "foo: whatever\nused_var: *foo1\nother_user_var: *foo2\n",
+                ],
+                true,
+                [
+                    "foo" => "whatever",
+                    "used_var" => "foo1",
+                    "other_user_var" => "foo2",
+                ],
+            ],
+        ];
     }
 }

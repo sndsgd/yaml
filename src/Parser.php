@@ -89,7 +89,7 @@ class Parser
      *
      * @param string $yaml The YAML to parse
      * @param int $maxDocuments The max number of documents, or `0` for unlimited
-     * @param int $prependedLines The number of lines prepended to the contents
+     * @param ParserFiles $parserFiles A list of files that are being parsed
      * @return mixed
      */
     public function parse(
@@ -130,9 +130,13 @@ class Parser
      * @param int $maxDocuments The max number of documents, or `0` for unlimited
      * @return mixed
      */
-    public function parseFile(string $path, int $maxDocuments = 1)
+    public function parseFile(
+        string $path,
+        int $maxDocuments = 1,
+        bool $filterVariables = true
+    )
     {
-        return $this->parseFiles([$path], $maxDocuments);
+        return $this->parseFiles([$path], $maxDocuments, $filterVariables);
     }
 
     /**
@@ -140,12 +144,33 @@ class Parser
      * errors messages accordingly
      *
      * @param array<string> $paths The paths to the files to merge and parse
+     * @param int $maxDocuments The
      * @return mixed
      */
-    public function parseFiles(array $paths, int $maxDocuments = 1)
+    public function parseFiles(
+        array $paths,
+        int $maxDocuments = 1,
+        bool $filterVariables = true
+    )
     {
-        $parserFiles = new ParserFiles(... $paths);
-        return $this->parse($parserFiles->getContents(), $maxDocuments, $parserFiles);
+        $parserFiles = new ParserFiles(...$paths);
+        $yaml = $parserFiles->getContents();
+        $result = $this->parse($yaml, $maxDocuments, $parserFiles);
+
+        # if variable filtering is disabled, or the result isn't an array,
+        # just return the initial result
+        if (!$filterVariables || !is_array($result)) {
+            return $result;
+        }
+
+        # iterate over the result, removing keys that being with an underscore
+        foreach (array_keys($result) as $key) {
+            if (\sndsgd\Str::beginsWith($key, "_")) {
+                unset($result[$key]);
+            }
+        }
+
+        return $result;
     }
 
     /**

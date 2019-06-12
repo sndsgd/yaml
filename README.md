@@ -77,9 +77,8 @@ Because yaml lacks import or include functionality, you may find yourself wantin
 
 _example-02.yaml_
 ```yaml
-urlencoded: &urlencoded application/x-www-form-urlencoded
-multipart: &multipart multipart/form-data
-json: &json application/json; charset=utf-8
+_json: &json application/json; charset=utf-8
+_auth_header: &auth_header "Bearer: OhEjnRmhl0LbbxgUcY1IIlqLOJmomw5C"
 ```
 
 _example-03.yaml_
@@ -88,6 +87,7 @@ url: /register
 method: POST
 headers:
   content-type: *json
+  authorization: *auth_header
 body:
   email: foo@example.com
 ```
@@ -95,4 +95,17 @@ body:
 ```php
 $data = $parser->parseFiles(["example-02.yaml", "example-03.yaml"]);
 echo json_encode($data, sndsgd\JSON::HUMAN) . PHP_EOL;
+```
+```json
+{
+    "url": "/register",
+    "method": "POST",
+    "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "authorization": "Bearer: OhEjnRmhl0LbbxgUcY1IIlqLOJmomw5C"
+    },
+    "body": {
+        "email": "foo@example.com"
+    }
+}
 ```
