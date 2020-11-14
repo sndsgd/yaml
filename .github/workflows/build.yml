@@ -1,0 +1,21 @@
+name: build
+
+on:
+  push:
+    branches: ["*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 1
+    - name: build image
+      run: make image IMAGE_ARGS=
+    - name: install dependencies
+      run: make composer-install
+    - name: coding standards checks
+      run: make cs
+    - name: unit tests
+      run: make test
