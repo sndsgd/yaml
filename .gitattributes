@@ -1,6 +1,7 @@
 /tests export-ignore
 /.editorconfig export-ignore
 /.gitattributes export-ignore
+/.github export-ignore
 /.gitignore export-ignore
 /composer.lock export-ignore
 /Dockerfile export-ignore
