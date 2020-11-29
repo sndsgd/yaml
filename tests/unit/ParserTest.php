@@ -89,4 +89,108 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage("parsing error encountered during parsing");
         (new Parser())->parse("key: {\n");
     }
+
+    /**
+     * @dataProvider provideParseMaxDocuments
+     */
+    public function testParseMaxDocuments(
+        string $yaml,
+        int $maxDocuments,
+        array $expect
+    ): void {
+        $parser = new Parser();
+        $this->assertSame($expect, $parser->parse($yaml, $maxDocuments));
+    }
+
+    public function provideParseMaxDocuments(): array
+    {
+        return [
+            [
+                <<<YAML
+                ---
+                one: 1
+                YAML,
+                1,
+                ["one" => 1],
+            ],
+            [
+                <<<YAML
+                ---
+                one: 1
+                YAML,
+                0,
+                [["one" => 1]],
+            ],
+            [
+                <<<YAML
+                ---
+                one: 1
+                ---
+                two: 2
+                YAML,
+                2,
+                [["one" => 1], ["two" => 2]],
+            ],
+            [
+                <<<YAML
+                ---
+                one: 1
+                ---
+                two: 2
+                YAML,
+                0,
+                [["one" => 1], ["two" => 2]],
+            ],
+            [
+                <<<YAML
+                ---
+                one: 1
+                ---
+                two: 2
+                ---
+                three: 3
+                YAML,
+                3,
+                [["one" => 1], ["two" => 2], ["three" => 3]],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideParseFiles
+     */
+    public function testParseFiles(
+        string $path,
+        int $maxDocuments,
+        array $expect
+    ): void {
+        $parser = new Parser();
+        $this->assertSame($expect, $parser->parseFile($path, $maxDocuments));
+    }
+
+    public function provideParseFiles(): array
+    {
+        return [
+            [
+                __DIR__ . "/../fixtures/1-doc.yaml",
+                1,
+                ["one" => 1],
+            ],
+            [
+                __DIR__ . "/../fixtures/1-doc.yaml",
+                0,
+                [["one" => 1]],
+            ],
+            [
+                __DIR__ . "/../fixtures/2-doc.yaml",
+                2,
+                [["one" => 1], ["two" => 2]],
+            ],
+            [
+                __DIR__ . "/../fixtures/2-doc.yaml",
+                0,
+                [["one" => 1], ["two" => 2]],
+            ],
+        ];
+    }
 }
