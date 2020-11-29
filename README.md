@@ -1,5 +1,9 @@
 # sndsgd/yaml
 
+[![Latest Version](https://img.shields.io/github/release/sndsgd/yaml.svg?style=flat-square)](https://github.com/sndsgd/yaml/releases)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/sndsgd/yaml/LICENSE)
+[![Build Status](https://img.shields.io/github/workflow/status/sndsgd/yaml/build?style=flat-square)](https://github.com/sndsgd/yaml/actions?query=workflow%3Abuild+branch%3Amaster)
+
 YAML parsing enhancements for PHP.
 
 ### Context
