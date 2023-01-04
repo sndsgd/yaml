@@ -2,6 +2,8 @@
 
 namespace sndsgd\yaml;
 
+use sndsgd\yaml\ParserContext;
+
 interface Callback
 {
     /**
@@ -25,6 +27,6 @@ interface Callback
         string $tag,
         $value,
         int $flags,
-        \sndsgd\yaml\ParserContext $context
+        ParserContext $context,
     );
 }

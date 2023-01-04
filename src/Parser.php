@@ -44,7 +44,7 @@ class Parser
 
     public function __construct(
         ?ParserContext $context = null,
-        string ...$callbackClasses
+        string ...$callbackClasses,
     ) {
         $this->context = $context ?? new ParserContext();
 
@@ -131,13 +131,13 @@ class Parser
      */
     public function parseFile(
         string $path,
-        int $maxDocuments = 1
+        int $maxDocuments = 1,
     ) {
-        $file = \sndsgd\Fs::file($path);
-        $yaml = $file->read();
+
+        $yaml = file_get_contents($path);
         if ($yaml === false) {
             throw new ParserException(
-                "failed to parse YAML file; " . $file->getError(),
+                "parsing YAML file failed; '$path' could not be read",
             );
         }
 
@@ -170,7 +170,6 @@ class Parser
      * @param string $message The error message
      * @param string $file The file the error was encountered in
      * @param int $line The line the error was encountered on
-     * @param array $definedVariables The variables defined when the error was encountered
      * @return bool
      * @throws ParserException
      */
@@ -179,7 +178,6 @@ class Parser
         string $message,
         string $file,
         int $line,
-        array $definedVariables
     ): bool {
         # strip the function name from the beginning of the error message
         $search = "yaml_parse(): ";
