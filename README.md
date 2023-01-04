@@ -8,7 +8,7 @@ YAML parsing enhancements for PHP.
 
 ### Context
 
-The `sndsgd\yaml\ParserContext` object is currently unused, but has been created to ensure compatibility moving forward.
+The `sndsgd\yaml\ParserContext` object is a data bag you can jam things into for use in callbacks.
 
 ### Callbacks
 
