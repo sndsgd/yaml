@@ -15,6 +15,10 @@ else
 	DOCKER_RUN_USER :=
 endif
 
+PHP_VERSION ?= 8.1
+COMPOSER_VERSION ?= 2.5.1
+COMPOSER_PHAR_URL ?= https://github.com/composer/composer/releases/download/$(COMPOSER_VERSION)/composer.phar
+
 IMAGE_NAME ?= sndsgd/yaml
 IMAGE_TAG ?= latest
 DOCKER_IMAGE ?= $(IMAGE_NAME):$(IMAGE_TAG)
@@ -37,6 +41,8 @@ image: ## Build the docker image
 	@echo "building image..."
 	@docker build \
 	  $(IMAGE_ARGS) \
+		--build-arg PHP_VERSION=$(PHP_VERSION) \
+		--build-arg COMPOSER_PHAR_URL=$(COMPOSER_PHAR_URL) \
 		--tag $(DOCKER_IMAGE) \
 		$(CWD)
 

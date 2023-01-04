@@ -30,7 +30,7 @@ class SecondsCallback implements Callback
         string $tag,
         $value,
         int $flags,
-        ParserContext $context
+        ParserContext $context,
     ) {
         if (!is_string($value)) {
             throw new ParserException(sprintf(self::ERR_MSG, "a non string value"));

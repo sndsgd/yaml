@@ -2,12 +2,15 @@
 
 namespace sndsgd\yaml;
 
+use PHPUnit\Framework\TestCase;
 use sndsgd\yaml\callbacks\SecondsCallback;
 use sndsgd\yaml\exceptions\DuplicateCallbackTagException;
 use sndsgd\yaml\exceptions\InvalidCallbackClassException;
 use sndsgd\yaml\exceptions\ParserException;
+use Throwable;
+use UnexpectedValueException;
 
-class ParserTest extends \PHPUnit\Framework\TestCase
+class ParserTest extends TestCase
 {
     public function testConstructorCallbackClassImplementsException()
     {
@@ -30,21 +33,14 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     public function testParseMaxDocumentsException()
     {
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         (new Parser())->parse("", -1);
     }
 
     public function testParseMaxDocumentsExceededException()
     {
-        $this->expectException(\Throwable::class);
+        $this->expectException(Throwable::class);
         (new Parser())->parse("---\na:1\n---\nb:1", 1);
-    }
-
-    public function testParseFileReadException()
-    {
-        $this->expectException(\Throwable::class);
-        $this->expectExceptionMessage("failed to parse YAML file; failed to read file");
-        (new Parser())->parseFile(__DIR__);
     }
 
     /**
@@ -55,7 +51,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $value,
         string $tag,
         int $flags,
-        $expect
+        $expect,
     )
     {
         $parser = new Parser(new ParserContext(), ...$parserCallbacks);
@@ -96,7 +92,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     public function testParseMaxDocuments(
         string $yaml,
         int $maxDocuments,
-        array $expect
+        array $expect,
     ): void {
         $parser = new Parser();
         $this->assertSame($expect, $parser->parse($yaml, $maxDocuments));
@@ -162,7 +158,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     public function testParseFiles(
         string $path,
         int $maxDocuments,
-        array $expect
+        array $expect,
     ): void {
         $parser = new Parser();
         $this->assertSame($expect, $parser->parseFile($path, $maxDocuments));

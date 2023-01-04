@@ -2,10 +2,11 @@
 
 namespace sndsgd\yaml\callbacks;
 
+use PHPUnit\Framework\TestCase;
 use sndsgd\yaml\exceptions\ParserException;
 use sndsgd\yaml\ParserContext;
 
-class SecondsCallbackTestish extends \PHPUnit\Framework\TestCase
+class SecondsCallbackTestish extends TestCase
 {
     private $context;
 
