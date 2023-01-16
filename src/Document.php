@@ -29,7 +29,7 @@ class Document
         return sprintf("%s document#%d", $path, $index);
     }
 
-    private function __construct(
+    protected function __construct(
         public readonly string $path,
         public readonly int $index,
         public readonly array $doc,

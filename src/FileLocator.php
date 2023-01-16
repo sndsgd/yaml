@@ -5,7 +5,10 @@ namespace sndsgd\yaml;
 use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use ReflectionClass;
+use ReflectionMethod;
 use Throwable;
+use UnexpectedValueException;
 
 class FileLocator
 {
@@ -24,7 +27,10 @@ class FileLocator
 
         foreach ($searchPaths as $searchPath) {
             if (!file_exists($searchPath)) {
-                $errors[$searchPath] = "path does not exist";
+                $errors[] = [
+                    "path" => $searchPath,
+                    "message" => "path does not exist",
+                ];
             } elseif (is_dir($searchPath)) {
                 foreach (self::createIterator($searchPath, $excludeRegex) as $file) {
                     $filePath = $file->getPathName();
@@ -43,29 +49,44 @@ class FileLocator
         array $excludePaths = [],
         string $documentClass = Document::class,
     ): array {
-        $docs = [];
+        $documentCreateMethod = self::verifyDocumentClass($documentClass);
 
         [$paths, $errors] = $this->findFiles($searchPaths, $excludePaths);
+        if ($errors !== []) {
+            return [[], $errors];
+        }
 
+        $docs = [];
         foreach ($paths as $path) {
             try {
                 $rawDocs = $this->parser->parseFile($path, 0);
             } catch (Throwable $ex) {
-                $errors[$path] = $ex->getMessage();
+                $errors[] = [
+                    "path" => $path,
+                    "message" => $ex->getMessage(),
+                ];
                 continue;
             }
 
             foreach ($rawDocs as $index => $rawDoc) {
                 try {
-                    $docs[] = $documentClass::create($path, $index, $rawDoc);
+                    $docs[] = $documentCreateMethod->invoke(
+                        null,
+                        $path,
+                        $index,
+                        $rawDoc,
+                    );
                 } catch (Throwable $ex) {
                     $debugPath = Document::renderDebugPath($path, $index);
-                    $errors[$debugPath] = $ex->getMessage();
+                    $errors[] = [
+                        "path" => $debugPath,
+                        "message" => $ex->getMessage(),
+                    ];
                 }
             }
         }
 
-        return [$docs, $errors];
+        return [array_filter($docs), $errors];
     }
 
     public static function isYamlFile(string $path): bool
@@ -125,5 +146,26 @@ class FileLocator
                 },
             ),
         );
+    }
+
+    private static function verifyDocumentClass(
+        string $class,
+    ): ReflectionMethod {
+        if ($class === Document::class) {
+            return new ReflectionMethod($class, "create");
+        }
+
+        $rc = new ReflectionClass($class);
+        if (!$rc->isSubclassOf(Document::class)) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    "provided document class '%s' must extend '%s'",
+                    $class,
+                    Document::class,
+                ),
+            );
+        }
+
+        return $rc->getMethod("create");
     }
 }

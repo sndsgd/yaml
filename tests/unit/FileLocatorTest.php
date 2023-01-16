@@ -75,7 +75,12 @@ class FileLocatorTest extends TestCase
                 TESTS_DIR . "/fixtures/nope",
             ],
             [],
-            [TESTS_DIR . "/fixtures/nope" => "path does not exist"],
+            [
+                [
+                    "path" => TESTS_DIR . "/fixtures/nope",
+                    "message" => "path does not exist",
+                ],
+            ],
             [
                 TESTS_DIR . "/fixtures/1-doc.yaml",
             ],
@@ -139,7 +144,12 @@ class FileLocatorTest extends TestCase
         yield [
             [TESTS_DIR . "/fixtures"],
             ["3-doc"],
-            [TESTS_DIR . "/fixtures/known-error.yaml" => "scanning error encountered during parsing: mapping values are not allowed in this context (line 2, column 9)"],
+            [
+                [
+                    "path" => TESTS_DIR . "/fixtures/known-error.yaml",
+                    "message" => "scanning error encountered during parsing: mapping values are not allowed in this context (line 2, column 9)",
+                ],
+            ],
             [
                 [
                     "path" => TESTS_DIR . "/fixtures/1-doc.yaml",
@@ -185,7 +195,12 @@ class FileLocatorTest extends TestCase
         );
 
         $this->assertSame(
-            [TESTS_DIR . "/fixtures/1-doc.yaml document#0" => "it did not work!"],
+            [
+                [
+                    "path" => TESTS_DIR . "/fixtures/1-doc.yaml document#0",
+                    "message" => "it did not work!",
+                ],
+            ],
             $errors,
         );
     }
