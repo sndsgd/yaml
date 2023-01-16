@@ -107,8 +107,6 @@ class FileLocatorTest extends TestCase
         sort($results);
         sort($expectDocs);
 
-        print_r(func_get_args());
-
         $this->assertSame($expectErrors, $errors);
         $this->assertSame($expectDocs, $results);
     }

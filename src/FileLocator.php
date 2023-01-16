@@ -52,9 +52,10 @@ class FileLocator
                 $rawDocs = $this->parser->parseFile($path, 0);
             } catch (Throwable $ex) {
                 $errors[$path] = $ex->getMessage();
+                continue;
             }
 
-            foreach (($rawDocs ?? []) as $index => $rawDoc) {
+            foreach ($rawDocs as $index => $rawDoc) {
                 try {
                     $docs[] = $documentClass::create($path, $index, $rawDoc);
                 } catch (Throwable $ex) {
