@@ -2,6 +2,7 @@
 
 namespace sndsgd\yaml;
 
+use ErrorException;
 use PHPUnit\Framework\TestCase;
 use sndsgd\yaml\callbacks\SecondsCallback;
 use sndsgd\yaml\exceptions\DuplicateCallbackTagException;
@@ -188,5 +189,13 @@ class ParserTest extends TestCase
                 [["one" => 1], ["two" => 2]],
             ],
         ];
+    }
+
+    public function testParseFileException(): void
+    {
+        $parser = new Parser();
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage("parsing YAML file failed");
+        $parser->parseFile(TESTS_DIR . "/fixtures/does-not-exist.yaml");
     }
 }
