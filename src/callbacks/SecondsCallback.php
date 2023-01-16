@@ -36,7 +36,7 @@ class SecondsCallback implements Callback
             throw new ParserException(sprintf(self::ERR_MSG, "a non string value"));
         }
 
-        if (empty($value)) {
+        if ($value === "") {
             throw new ParserException(sprintf(self::ERR_MSG, "an empty value"));
         }
 

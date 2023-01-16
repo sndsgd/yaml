@@ -1,8 +1,9 @@
 parameters:
     level: 5
+    scanFiles:
+        - bootstrap.php
     paths:
         - src
         - tests
-        - build
     parallel:
         maximumNumberOfProcesses: 4

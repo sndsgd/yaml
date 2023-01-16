@@ -2,6 +2,7 @@
 
 namespace sndsgd\yaml;
 
+use ErrorException;
 use sndsgd\yaml\exceptions\DuplicateCallbackTagException;
 use sndsgd\yaml\exceptions\InvalidCallbackClassException;
 use sndsgd\yaml\exceptions\ParserException;
@@ -133,13 +134,23 @@ class Parser
         string $path,
         int $maxDocuments = 1,
     ) {
+        set_error_handler(static function (
+            int $code,
+            string $message,
+            string $file,
+            int $line,
+        ) {
+            throw new ErrorException(
+                "parsing YAML file failed; $message",
+                $code,
+                E_ERROR,
+                $file,
+                $line,
+            );
+        });
 
         $yaml = file_get_contents($path);
-        if ($yaml === false) {
-            throw new ParserException(
-                "parsing YAML file failed; '$path' could not be read",
-            );
-        }
+        restore_error_handler();
 
         return $this->parse($yaml, $maxDocuments);
     }

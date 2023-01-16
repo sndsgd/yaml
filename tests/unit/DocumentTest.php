@@ -14,7 +14,7 @@ class YamlDocumentTest extends TestCase
         int $index,
         string $expect,
     ): void {
-        $doc = new Document($path, $index, []);
+        $doc = Document::create($path, $index, []);
         $this->assertSame($expect, $doc->getDebugPath());
     }
 
