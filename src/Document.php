@@ -18,7 +18,7 @@ class Document
         string $path,
         int $index,
         array $doc,
-    ): self {
+    ): ?self {
         return new self($path, $index, $doc);
     }
 
