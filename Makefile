@@ -22,11 +22,12 @@ COMPOSER_PHAR_URL ?= https://github.com/composer/composer/releases/download/$(CO
 IMAGE_NAME ?= sndsgd/yaml
 IMAGE_TAG ?= latest
 DOCKER_IMAGE ?= $(IMAGE_NAME):$(IMAGE_TAG)
+WORK_DIR ?= /srv
 DOCKER_RUN ?= $(DOCKER_BIN) run \
 	$(DOCKER_DEFAULT_OPTIONS) \
 	$(DOCKER_RUN_USER) \
-	--volume $(CWD):$(CWD) \
-	--workdir $(CWD) \
+	--volume $(CWD):$(WORK_DIR) \
+	--workdir $(WORK_DIR) \
 	$(DOCKER_IMAGE)
 
 .PHONY: help
