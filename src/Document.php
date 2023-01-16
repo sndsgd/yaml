@@ -2,7 +2,7 @@
 
 namespace sndsgd\yaml;
 
-class YamlDocument
+class Document
 {
     public function __construct(
         public readonly string $path,
