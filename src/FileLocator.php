@@ -29,7 +29,7 @@ class FileLocator
             if (!file_exists($searchPath)) {
                 $errors[] = [
                     "path" => $searchPath,
-                    "message" => "path does not exist",
+                    "message" => "provided search path does not exist",
                 ];
             } elseif (is_dir($searchPath)) {
                 foreach (self::createIterator($searchPath, $excludeRegex) as $file) {
@@ -70,7 +70,7 @@ class FileLocator
 
             foreach ($rawDocs as $index => $rawDoc) {
                 try {
-                    $docs[] = $documentCreateMethod->invoke(
+                    $doc = $documentCreateMethod->invoke(
                         null,
                         $path,
                         $index,
@@ -82,11 +82,16 @@ class FileLocator
                         "path" => $debugPath,
                         "message" => $ex->getMessage(),
                     ];
+                    continue;
+                }
+
+                if ($doc !== null) {
+                    $docs[] = $doc;
                 }
             }
         }
 
-        return [array_filter($docs), $errors];
+        return [$docs, $errors];
     }
 
     public static function isYamlFile(string $path): bool
