@@ -78,7 +78,7 @@ class FileLocatorTest extends TestCase
             [
                 [
                     "path" => TESTS_DIR . "/fixtures/nope",
-                    "message" => "path does not exist",
+                    "message" => "provided search path does not exist",
                 ],
             ],
             [

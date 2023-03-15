@@ -15,20 +15,15 @@ else
 	DOCKER_RUN_USER :=
 endif
 
-PHP_VERSION ?= 8.1
-COMPOSER_VERSION ?= 2.5.1
-COMPOSER_PHAR_URL ?= https://github.com/composer/composer/releases/download/$(COMPOSER_VERSION)/composer.phar
-
-IMAGE_NAME ?= sndsgd/yaml
-IMAGE_TAG ?= latest
-DOCKER_IMAGE ?= $(IMAGE_NAME):$(IMAGE_TAG)
-WORK_DIR ?= /srv
+PHP_VERSION ?= 8.2
+IMAGE_NAME ?= ghcr.io/sndsgd/php
+IMAGE ?= $(IMAGE_NAME):$(PHP_VERSION)
 DOCKER_RUN ?= $(DOCKER_BIN) run \
 	$(DOCKER_DEFAULT_OPTIONS) \
 	$(DOCKER_RUN_USER) \
-	--volume $(CWD):$(WORK_DIR) \
-	--workdir $(WORK_DIR) \
-	$(DOCKER_IMAGE)
+	--volume $(CWD):$(CWD) \
+	--workdir $(CWD) \
+	$(IMAGE)
 
 .PHONY: help
 help:
@@ -36,23 +31,9 @@ help:
 	| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%s\033[0m~%s\n", $$1, $$2}' \
 	| column -s "~" -t
 
-IMAGE_ARGS ?= --quiet
-.PHONY: image
-image: ## Build the docker image
-	@echo "building image..."
-	@docker build \
-	  $(IMAGE_ARGS) \
-		--build-arg PHP_VERSION=$(PHP_VERSION) \
-		--build-arg COMPOSER_PHAR_URL=$(COMPOSER_PHAR_URL) \
-		--tag $(DOCKER_IMAGE) \
-		$(CWD)
-
 .PHONY: prepare-build-directory
 prepare-build-directory:
-	rm -rf $(CWD)/build && mkdir $(CWD)/build
-
-.PHONY: build
-build: composer-install cs test-coverage analyze
+	@rm -rf $(CWD)/build && mkdir $(CWD)/build
 
 ###############################################################################
 # composer ####################################################################
@@ -61,7 +42,7 @@ build: composer-install cs test-coverage analyze
 COMPOSER_ARGS ?= --help
 .PHONY: composer
 composer: ## Run an arbitrary composer command
-composer: image
+composer:
 	$(DOCKER_RUN) /bin/composer $(COMPOSER_ARGS)
 
 .PHONY: composer-install
@@ -80,7 +61,7 @@ composer-update: composer
 
 PHPLINT_ARGS ?= --help
 .PHONY: phplint
-phplint: image
+phplint:
 	$(DOCKER_RUN) vendor/bin/parallel-lint $(PHPLINT_ARGS)
 
 .PHONY: lint
@@ -93,7 +74,7 @@ lint: phplint
 
 PHPCS_ARGS ?= --help
 .PHONY: phpcs
-phpcs: image lint
+phpcs: lint
 	$(DOCKER_RUN) vendor/bin/phpcs $(PHPCS_ARGS)
 
 .PHONY: cs
@@ -103,7 +84,7 @@ cs: phpcs
 
 PHPCBF_ARGS ?= --help
 .PHONY: phpcbf
-phpcbf: image lint
+phpcbf: lint
 	$(DOCKER_RUN) vendor/bin/phpcbf $(PHPCBF_ARGS)
 
 .PHONY: cs-fix
@@ -117,7 +98,7 @@ cs-fix: phpcbf
 
 PHPSTAN_ARGS ?= --help
 .PHONY: phpstan
-phpstan: image
+phpstan:
 	$(DOCKER_RUN) vendor/bin/phpstan $(PHPSTAN_ARGS)
 
 .PHONY: analyze
@@ -131,7 +112,7 @@ analyze: phpstan
 
 PHPUNIT_ARGS ?= --help
 .PHONY: phpunit
-phpunit: image lint prepare-build-directory
+phpunit: lint prepare-build-directory
 	$(DOCKER_RUN) vendor/bin/phpunit $(PHPUNIT_ARGS)
 
 .PHONY: test
@@ -140,9 +121,8 @@ test: override PHPUNIT_ARGS = --do-not-cache-result --no-coverage
 test: phpunit
 
 .PHONY: test-coverage
-test-coverage: ## Run unit tests with code coverage
+test-coverage: ## Run unit tests and generate coverage report
 test-coverage: override PHPUNIT_ARGS = --do-not-cache-result
-test-coverage: prepare-build-directory phpunit
-	open $(CWD)/build/coverage/index.html
+test-coverage: phpunit
 
 .DEFAULT_GOAL := help
