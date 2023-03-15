@@ -31,6 +31,10 @@ help:
 	| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%s\033[0m~%s\n", $$1, $$2}' \
 	| column -s "~" -t
 
+.PHONY: todo
+todo: ## Show `TODO` lines present in the repo
+	@git grep TODO | grep -v '## Show `TODO`' | grep -v '@git grep TODO'
+
 .PHONY: prepare-build-directory
 prepare-build-directory:
 	@rm -rf $(CWD)/build && mkdir $(CWD)/build
@@ -42,7 +46,6 @@ prepare-build-directory:
 COMPOSER_ARGS ?= --help
 .PHONY: composer
 composer: ## Run an arbitrary composer command
-composer:
 	$(DOCKER_RUN) /bin/composer $(COMPOSER_ARGS)
 
 .PHONY: composer-install
@@ -65,6 +68,7 @@ phplint:
 	$(DOCKER_RUN) vendor/bin/parallel-lint $(PHPLINT_ARGS)
 
 .PHONY: lint
+lint: ## Lint source files
 lint: override PHPLINT_ARGS = src tests
 lint: phplint
 
@@ -88,7 +92,7 @@ phpcbf: lint
 	$(DOCKER_RUN) vendor/bin/phpcbf $(PHPCBF_ARGS)
 
 .PHONY: cs-fix
-cs-fix: ## Run coding standards checks
+cs-fix: ## Fix coding standards issues
 cs-fix: override PHPCBF_ARGS = --standard=phpcs.xml -p -v src tests
 cs-fix: phpcbf
 
@@ -102,7 +106,7 @@ phpstan:
 	$(DOCKER_RUN) vendor/bin/phpstan $(PHPSTAN_ARGS)
 
 .PHONY: analyze
-analyze: ## Run static analysis checks
+analyze: ## Run static analysis
 analyze: override PHPSTAN_ARGS = analyze --configuration phpstan.neon
 analyze: phpstan
 
